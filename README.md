@@ -337,7 +337,28 @@ data:
 
 ### Karpenter
 Karpenter is an open-source node provisioning project built for Kubernetes.
-[GitHub Repository](https://github.com/aws/karpenter)
+
+### Features Overview
+The AKS Karpenter Provider enables node autoprovisioning using Karpenter on your AKS cluster. Karpenter improves the efficiency and cost of running workloads on Kubernetes clusters by:
+
+- Watching for pods that the Kubernetes scheduler has marked as unschedulable
+- Evaluating scheduling constraints (resource requests, node selectors, affinities, tolerations, and topology-spread constraints) requested by the pods
+- Provisioning nodes that meet the requirements of the pods
+- Removing the nodes when they are no longer needed
+- Consolidating existing nodes onto cheaper nodes with higher utilization per node
+
+### Node Auto Provisioning (NAP) vs. Self-hosted
+Karpenter provider for AKS can be used in two modes:
+
+- **Node Auto Provisioning (NAP) mode (preview):** Karpenter is run by AKS as a managed addon similar to managed Cluster Autoscaler. This is the recommended mode for most users. Follow the instructions in Node Auto Provisioning documentation to use Karpenter in that mode.
+- **Self-hosted mode:** Karpenter is run as a standalone deployment in the cluster. This mode is useful for advanced users who want to customize or experiment with Karpenter's deployment. The rest of this page describes how to use Karpenter in self-hosted mode.
+
+### Known limitations
+- Only AKS clusters with Azure CNI Overlay + Cilium networking are supported.
+- Only Linux nodes are supported.
+
+[GitHub Repository](https://github.com/Azure/karpenter-provider-azure)
+
 
 **Installation:**
 ```sh
@@ -346,15 +367,48 @@ helm install karpenter karpenter/karpenter
 ```
 
 **Example Provisioner:**
-```yaml
-apiVersion: karpenter.sh/v1alpha5
-kind: Provisioner
+```sh
+cat <<EOF | kubectl apply -f -
+---
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
+metadata:
+  name: general-purpose
+  annotations:
+    kubernetes.io/description: "General purpose NodePool for generic workloads"
+spec:
+  template:
+    spec:
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+        - key: karpenter.azure.com/sku-family
+          operator: NotIn
+          values: ["D", "E", "F"]
+      nodeClassRef:
+        name: default
+  limits:
+    cpu: 100
+  disruption:
+    consolidationPolicy: WhenUnderutilized
+    expireAfter: Never
+---
+apiVersion: karpenter.azure.com/v1alpha2
+kind: AKSNodeClass
 metadata:
   name: default
+  annotations:
+    kubernetes.io/description: "General purpose AKSNodeClass for running Ubuntu2204 nodes"
 spec:
-  cluster:
-    name: my-cluster
-  ttlSecondsAfterEmpty: 30
+  imageFamily: Ubuntu2204
+EOF
 ```
 
 ### Cilium
