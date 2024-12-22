@@ -76,6 +76,19 @@ spec:
                                     type: integer
 ```
 
+## What are Kubernetes controllers?
+
+Kubernetes controllers are control loops that track your resource clusters and alter them to match the desired state in a continuous cycle. For example, if you need to roast a chicken at 400 degrees Fahrenheit, the control loop in this case would monitor the oven temperature to keep it as close to your desired temperature as possible. If the temperature goes below or above 400, the control loop automatically adjusts the oven controls to fix it.
+
+This is exactly how Kubernetes controllers work — they monitor the resources and conditions an admin has requested in a desired state and implement them automatically. Controllers ensure that the desired and actual states are in constant alignment.
+
+## What are Kubernetes operators?
+
+Kubernetes operators are a subcategory of controllers that use API extensions — or custom resources — to complete tasks. Operators are typically constructed as a set of independent controllers, each responsible for its own subset of tasks and resources pertaining to the managed application.
+
+While an operator shares similar functions with a controller, it exclusively utilizes custom resources and focuses on one domain.
+
+On the other hand, controllers work without custom resources or API extensions and don’t need to connect to a specific domain. Operators are well-suited to meet operational needs for a specific application or platform, but they do not accommodate generic resource cluster states as well as controllers.
 
 ### KEDA
 KEDA (Kubernetes Event-driven Autoscaling) is a Kubernetes-based event-driven autoscaler that can scale applications based on the number of events needing to be processed. It supports various event sources, including message queues, databases, and more.
