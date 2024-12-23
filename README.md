@@ -6,22 +6,230 @@
 This repository contains comprehensive information about various Kubernetes add-ons, tools, and security practices. It serves as a guide for implementing and understanding key components in Azure Kubernetes Service (AKS) environments.
 
 ## Table of Contents
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+  - [Azure CLI](#azure-cli)
+  - [kubectl](#kubectl)
+  - [kubectx and kubens](#kubectx-and-kubens)
+  - [Helm](#helm)
+  - [jq](#jq)
+  - [kubens](#kubens)
+  - [k9s](#k9s)
+  - [stern](#stern)
+  - [kustomize](#kustomize)
+- [Authenticating with AKS Cluster](#authenticating-with-aks-cluster)
+  - [Step 1: Login to Azure](#step-1-login-to-azure)
+  - [Step 2: Get AKS Credentials](#step-2-get-aks-credentials)
+  - [Step 3: Verify Connection](#step-3-verify-connection)
+- [Public FQDN](#public-fqdn)
 - [Kubernetes Add-ons](#kubernetes-add-ons)
-    - [KEDA](#keda)
-    - [Kyverno](#kyverno)
-    - [External Secrets](#external-secrets---key-vault)
-    - [Polaris](#polaris)
-    - [Cluster Autoscaler](#cluster-autoscaler)
-    - [Karpenter](#karpenter)
-    - [Cilium](#cilium)
-    - [Reloader](#reloader)
-    - [Argo](#argo)
-    - [Grafana and Prometheus](#grafana-and-prometheus)
+  - [Custom Resource Definitions (CRDs)](#custom-resource-definitions-crds)
+  - [Cluster Autoscaler](#cluster-autoscaler)
+  - [KEDA](#keda)
+  - [Kyverno](#kyverno)
+  - [External Secrets - Key Vault](#external-secrets---key-vault)
+  - [Polaris](#polaris)
+  - [Karpenter](#karpenter)
+  - [Cilium](#cilium)
+  - [Reloader](#reloader)
+  - [Argo](#argo)
+  - [Grafana and Prometheus](#grafana-and-prometheus)
 - [Kubernetes Security](#kubernetes-security)
-    - [Security Tools](#repositories--tools)
-    - [Learning Resources](#learning)
-    - [Attack Tools](#attacking)
-    - [Defense Tools](#defending)
+  - [Repositories / Tools](#repositories--tools)
+  - [Learning](#learning)
+  - [Attacking](#attacking)
+  - [Defending](#defending)
+- [Live Demo Links](#live-demo-links)
+  - [Application Links](#application-links)
+  - [Monitoring & Management Tools](#monitoring--management-tools)
+
+## Prerequisites
+
+Before starting with the AKS-Workshop, ensure you have the following tools installed on your local machine:
+
+### Azure CLI
+Azure CLI is a command-line tool for managing Azure resources.
+
+**Installation:**
+```sh
+# On macOS
+brew install azure-cli
+
+# On Windows
+winget install Microsoft.AzureCLI
+
+# On Linux
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+```
+
+### kubectl
+kubectl is the command-line tool for interacting with Kubernetes clusters.
+
+**Installation:**
+```sh
+# On macOS
+brew install kubectl
+
+# On Windows
+choco install kubernetes-cli
+
+# On Linux
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+```
+
+### kubectx and kubens
+kubectx and kubens are tools for switching between Kubernetes contexts and namespaces.
+
+**Installation:**
+```sh
+# On macOS
+brew install kubectx
+
+# On Windows
+choco install kubectx
+
+# On Linux
+sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+```
+
+### Helm
+Helm is a package manager for Kubernetes.
+
+**Installation:**
+```sh
+# On macOS
+brew install helm
+
+# On Windows
+choco install kubernetes-helm
+
+# On Linux
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+### jq
+jq is a lightweight and flexible command-line JSON processor.
+
+**Installation:**
+```sh
+# On macOS
+brew install jq
+
+# On Windows
+choco install jq
+
+# On Linux
+sudo apt-get install jq
+```
+
+### kubens
+kubens is a tool for switching between Kubernetes namespaces.
+
+**Installation:**
+```sh
+# On macOS
+brew install kubens
+
+# On Windows
+choco install kubens
+
+# On Linux
+sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+```
+
+### k9s
+k9s provides a terminal UI to interact with your Kubernetes clusters.
+
+**Installation:**
+```sh
+# On macOS
+brew install derailed/k9s/k9s
+
+# On Windows
+choco install k9s
+
+# On Linux
+curl -sS https://webinstall.dev/k9s | bash
+```
+
+### stern
+stern allows you to tail multiple pods on Kubernetes and aggregate their logs.
+
+**Installation:**
+```sh
+# On macOS
+brew install stern
+
+# On Windows
+choco install stern
+
+# On Linux
+curl -Lo stern https://github.com/wercker/stern/releases/download/1.11.0/stern_linux_amd64
+chmod +x stern
+sudo mv stern /usr/local/bin
+```
+
+### kustomize
+kustomize lets you customize Kubernetes YAML configurations.
+
+**Installation:**
+```sh
+# On macOS
+brew install kustomize
+
+# On Windows
+choco install kustomize
+
+# On Linux
+curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+```
+
+Ensure all these tools are installed and properly configured before proceeding with the workshop.
+## Authenticating with AKS Cluster
+
+To interact with your Azure Kubernetes Service (AKS) cluster, you need to authenticate using the Azure CLI. Follow these steps to authenticate and configure access to your AKS cluster:
+
+### Step 1: Login to Azure
+First, log in to your Azure account using the Azure CLI:
+```sh
+az login
+```
+This command will open a web browser window for you to sign in with your Azure credentials. If you are using a service principal, use the following command instead:
+```sh
+az login --service-principal --username <appId> --password <password> --tenant <tenant>
+```
+
+### Step 2: Get AKS Credentials
+Next, get the credentials for your AKS cluster. Replace `<resource-group>` and `<cluster-name>` with your resource group and cluster name:
+```sh
+az aks get-credentials --resource-group <resource-group> --name <cluster-name>
+```
+This command configures `kubectl` to use the credentials for your AKS cluster.
+
+### Step 3: Verify Connection
+Verify that you can connect to your AKS cluster by running:
+```sh
+kubectl get nodes
+```
+This command should return a list of nodes in your AKS cluster, confirming that you are authenticated and connected.
+
+## Public FQDN
+
+The Public Fully Qualified Domain Name (FQDN) is a unique domain name assigned to your AKS cluster. It allows you to access the cluster's API server from the internet. The FQDN is typically in the format:
+```
+<cluster-name>.<region>.azmk8s.io
+```
+You can find the FQDN of your AKS cluster using the Azure CLI:
+```sh
+az aks show --resource-group <resource-group> --name <cluster-name> --query "fqdn" -o tsv
+```
+This command will output the FQDN of your AKS cluster, which you can use to access the cluster's API server or configure DNS settings for your applications.
+
+Ensure that your network security rules and firewall settings allow access to the AKS API server from your desired locations to use the FQDN effectively.
 
 ## Kubernetes Add-ons
 
@@ -89,6 +297,43 @@ Kubernetes operators are a subcategory of controllers that use API extensions â€
 While an operator shares similar functions with a controller, it exclusively utilizes custom resources and focuses on one domain.
 
 On the other hand, controllers work without custom resources or API extensions and donâ€™t need to connect to a specific domain. Operators are well-suited to meet operational needs for a specific application or platform, but they do not accommodate generic resource cluster states as well as controllers.
+### Cluster Autoscaler
+Cluster Autoscaler automatically adjusts the size of the Kubernetes cluster when there are insufficient resources.
+[GitHub Repository](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
+
+**Installing Azure CLI**
+
+To install the Azure CLI, follow the instructions provided in the [official documentation](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+
+**Configuring Cluster Autoscaler with Azure CLI**
+
+You can configure the Cluster Autoscaler using the Azure CLI. This method allows you to set various parameters and flags to customize the scaling behavior.
+
+**Example Command:**
+```sh
+az aks nodepool update \
+  --resource-group myResourceGroup \
+  --cluster-name myAKSCluster \
+  --name myNodePool \
+  --enable-cluster-autoscaler \
+  --min-count 1 \
+  --max-count 5
+```
+
+**Flags Explanation:**
+- `--resource-group`: The name of the resource group containing the AKS cluster.
+- `--cluster-name`: The name of the AKS cluster.
+- `--name`: The name of the node pool to update.
+- `--enable-cluster-autoscaler`: Enables the Cluster Autoscaler for the specified node pool.
+- `--min-count`: The minimum number of nodes for the node pool.
+- `--max-count`: The maximum number of nodes for the node pool.
+- `--scale-down-delay-after-add`: Time to wait after adding a node before considering scale down (e.g., `10m` for 10 minutes).
+- `--scale-down-unneeded-time`: Time a node should be unneeded before it is eligible for scale down (e.g., `10m` for 10 minutes).
+- `--scale-down-utilization-threshold`: Node utilization level below which a node can be considered for scale down (e.g., `0.5` for 50% utilization).
+
+You can adjust these flags based on your specific requirements. This command helps ensure that your node pool scales automatically within the defined limits.
+
+For more detailed information on configuring profiles, refer to the [Azure CLI documentation](https://docs.microsoft.com/en-us/cli/azure/manage-azure-subscriptions-azure-cli).
 
 ### KEDA
 KEDA (Kubernetes Event-driven Autoscaling) is a Kubernetes-based event-driven autoscaler that can scale applications based on the number of events needing to be processed. It supports various event sources, including message queues, databases, and more.
