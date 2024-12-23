@@ -39,9 +39,6 @@ This repository contains comprehensive information about various Kubernetes add-
   - [Learning](#learning)
   - [Attacking](#attacking)
   - [Defending](#defending)
-- [Live Demo Links](#live-demo-links)
-  - [Application Links](#application-links)
-  - [Monitoring & Management Tools](#monitoring--management-tools)
 
 ## Prerequisites
 
@@ -857,22 +854,3 @@ spec:
 - [KICS](https://github.com/Checkmarx/kics) - Keeping Infrastructure as Code Secure.
 - [cnspec](https://github.com/mondoohq/cnspec) - Cloud-native security and policy project.
 - [M9sweeper](https://github.com/m9sweeper/m9sweeper) - Kubernetes security platform.
-
-## Live Demo Links
-
-### Application Links
-- **Store Demo**: [http://store-demo.lacoyart.online/](http://store-demo.lacoyart.online/)
-    - Frontend
-    - Order Service: [/order-service](http://store-demo.lacoyart.online/order-service)
-    - Product Service: [/product-service](http://store-demo.lacoyart.online/product-service)
-
-- **CRUD Car Demo**: [http://crud-car.lacoyart.online/](http://crud-car.lacoyart.online/)
-    - Cars UI: [/cars](http://crud-car.lacoyart.online/cars)
-    - Swagger API Documentation: [/swagger](http://crud-car.lacoyart.online/swagger)
-
-### Monitoring & Management Tools
-- **ArgoCD**: [http://argocd.lacoyart.online/](http://argocd.lacoyart.online/)
-- **Goldilocks**: [http://goldilocks.lacoyart.online/](http://goldilocks.lacoyart.online/)
-- **Hubble UI**: [http://hubble.lacoyart.online/](http://hubble.lacoyart.online/)
-- **Grafana**: [http://grafana.lacoyart.online/](http://grafana.lacoyart.online/)
-- **Polaris**: [http://polaris.lacoyart.online/](http://polaris.lacoyart.online/)
