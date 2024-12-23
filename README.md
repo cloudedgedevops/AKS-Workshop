@@ -301,10 +301,6 @@ On the other hand, controllers work without custom resources or API extensions a
 Cluster Autoscaler automatically adjusts the size of the Kubernetes cluster when there are insufficient resources.
 [GitHub Repository](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
 
-**Installing Azure CLI**
-
-To install the Azure CLI, follow the instructions provided in the [official documentation](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
-
 **Configuring Cluster Autoscaler with Azure CLI**
 
 You can configure the Cluster Autoscaler using the Azure CLI. This method allows you to set various parameters and flags to customize the scaling behavior.
